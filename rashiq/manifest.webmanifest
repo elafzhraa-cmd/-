@@ -1,0 +1,15 @@
+{
+  "name": "RASH.IQ — جيمات بغداد",
+  "short_name": "RASH.IQ",
+  "description": "خريطة ذكية لاكتشاف الجيمات ومراكز اللياقة في بغداد.",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b0f10",
+  "theme_color": "#0b0f10",
+  "icons": [
+    {"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}
