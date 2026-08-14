@@ -1,0 +1,3 @@
+RASH.IQ MVP
+version=0.1.0
+reviewed=2026-08-14
