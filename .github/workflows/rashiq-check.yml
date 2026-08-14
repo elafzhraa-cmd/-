@@ -1,0 +1,24 @@
+name: Check RASH.IQ
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check JavaScript syntax
+        run: node --check rashiq/app.js
+      - name: Check manifest JSON
+        run: python -m json.tool rashiq/manifest.webmanifest > /dev/null
+      - name: Check required app files
+        run: |
+          test -s rashiq/index.html
+          test -s rashiq/style.css
+          test -s rashiq/app.js
+          test -s rashiq/icon.svg
+          test -s rashiq/icon-192.svg
+          test -s rashiq/icon-512.svg
+          test -s rashiq/manifest.webmanifest
+          test -s rashiq/sw.js
