@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0f10" />
+  <meta name="description" content="RASH.IQ — خريطة ذكية لاكتشاف الجيمات ومراكز اللياقة في بغداد." />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="RASH.IQ" />
+  <title>RASH.IQ | جيمات بغداد على الخريطة</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&family=Noto+Kufi+Arabic:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIINfQ3ynhZ7mSs0WBtr77uvNUH4Yw9wVyk=" crossorigin="" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <noscript><div class="noscript">هذا التطبيق يحتاج JavaScript حتى يعرض الخريطة والجيمات.</div></noscript>
+
+  <div class="app" id="app">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="RASH.IQ الرئيسية">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 48 48" role="img"><path d="M24 3C14.1 3 6 11.1 6 21c0 13 15.6 23.1 17.3 24.2.4.3 1 .3 1.4 0C26.4 44.1 42 34 42 21 42 11.1 33.9 3 24 3Z" fill="currentColor"/><path d="M14 19h5v-3h3v10h-3v-3h-5v3h-3V16h3v3Zm20 0v-3h3v10h-3v-3h-5v3h-3V16h3v3h5Z" fill="#0b0f10"/><rect x="19" y="19" width="10" height="4" rx="2" fill="#0b0f10"/></svg>
+        </span>
+        <span class="brand-copy"><b>RASH<span>.IQ</span></b><small>رشيق</small></span>
+      </a>
+
+      <div class="search-wrap" role="search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.35-4.35m2.35-5.15A7.5 7.5 0 1 1 4 11.5a7.5 7.5 0 0 1 15 0Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input id="searchInput" type="search" autocomplete="off" placeholder="دور باسم الجيم أو المنطقة…" aria-label="البحث عن جيم" />
+        <button class="clear-search" id="clearSearch" aria-label="مسح البحث" hidden>×</button>
+      </div>
+
+      <div class="top-actions">
+        <button class="icon-btn" id="refreshBtn" title="تحديث البيانات" aria-label="تحديث بيانات الجيمات"><svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button class="icon-btn" id="locateBtn" title="موقعي" aria-label="استخدام موقعي"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1m0-12.8-2.1 2.1m-8.6 8.6-2.1 2.1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+        <button class="install-btn" id="installBtn" hidden>ثبّت التطبيق</button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-head"><div><p class="eyebrow">بغداد · العراق</p><h1>جيمك الجاي أقرب مما تتوقع.</h1></div><button class="sheet-toggle" id="sheetToggle" aria-label="طي أو فتح قائمة الجيمات"><span></span></button></div>
+        <div class="status-row"><span class="live-pill" id="dataStatus"><i></i> قاعدة موثّقة + خريطة حيّة</span><span class="count-pill" id="gymCount">— جيم</span></div>
+        <div class="filters" id="filters" aria-label="تصفية الجيمات">
+          <button class="filter active" data-filter="all">الكل</button><button class="filter" data-filter="classic">أوزان ولياقة</button><button class="filter" data-filter="functional">Functional</button><button class="filter" data-filter="women">للنساء</button><button class="filter" data-filter="247">24/7</button><button class="filter" data-filter="saved">المحفوظة</button>
+        </div>
+        <div class="sort-row"><button class="sort-btn active" id="sortRecommended">الأفضل للبدء</button><button class="sort-btn" id="sortNearest">الأقرب إليّ</button><span class="coverage" id="coverageLabel">تحديث حي عند فتح التطبيق</span></div>
+        <div class="gym-list" id="gymList" aria-live="polite"></div>
+        <div class="empty-state" id="emptyState" hidden><div class="empty-icon">⌁</div><h3>ما لقينا نتيجة بهالفلاتر</h3><p>جرّب اسم ثاني أو رجّع الفلتر إلى «الكل».</p><button id="resetFilters">إظهار كل الجيمات</button></div>
+      </aside>
+
+      <section class="map-panel" aria-label="خريطة جيمات بغداد">
+        <div id="map"></div>
+        <div class="map-badge map-badge-top"><span class="dot"></span><span id="mapHint">اسحب الخريطة واستكشف بغداد</span></div>
+        <button class="floating-locate" id="floatingLocate" aria-label="الانتقال إلى موقعي"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+        <div class="map-legend"><span><i class="legend-pin verified"></i> متحقق</span><span><i class="legend-pin osm"></i> OpenStreetMap</span></div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="التنقل">
+      <button class="nav-item active" data-nav="map"><svg viewBox="0 0 24 24"><path d="m3 6 5-3 8 3 5-3v15l-5 3-8-3-5 3V6Zm5-3v15m8-12v15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span>الخريطة</span></button>
+      <button class="nav-item" data-nav="nearby"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>قريب مني</span></button>
+      <button class="nav-item" data-nav="saved"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4V3Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span>المحفوظة</span></button>
+      <button class="nav-item" data-nav="about"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v6m0-10h.01" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><span>عن RASH.IQ</span></button>
+    </nav>
+  </div>
+
+  <div class="modal" id="detailsModal" aria-hidden="true"><div class="modal-backdrop" data-close-modal></div><section class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="detailsTitle"><button class="modal-close" data-close-modal aria-label="إغلاق">×</button><div id="detailsContent"></div></section></div>
+  <div class="modal" id="aboutModal" aria-hidden="true"><div class="modal-backdrop" data-close-about></div><section class="modal-sheet about-sheet" role="dialog" aria-modal="true" aria-labelledby="aboutTitle"><button class="modal-close" data-close-about aria-label="إغلاق">×</button><div class="about-logo"><span class="brand-mark"><svg viewBox="0 0 48 48"><path d="M24 3C14.1 3 6 11.1 6 21c0 13 15.6 23.1 17.3 24.2.4.3 1 .3 1.4 0C26.4 44.1 42 34 42 21 42 11.1 33.9 3 24 3Z" fill="currentColor"/><path d="M14 19h5v-3h3v10h-3v-3h-5v3h-3V16h3v3Zm20 0v-3h3v10h-3v-3h-5v3h-3V16h3v3h5Z" fill="#0b0f10"/><rect x="19" y="19" width="10" height="4" rx="2" fill="#0b0f10"/></svg></span><div><h2 id="aboutTitle">RASH<span>.IQ</span></h2><p>كل جيمات بغداد. على خريطتك.</p></div></div><div class="about-grid"><article><b>01</b><h3>بيانات حيّة</h3><p>التطبيق يجلب الأماكن الرياضية المرسومة على OpenStreetMap عند الفتح، ويضم معها قاعدة جيمات راجعناها يدويًا.</p></article><article><b>02</b><h3>بدون حساب</h3><p>ما نطلب اسم أو رقم. المفضلة تنحفظ على جهازك فقط.</p></article><article><b>03</b><h3>تحقق قبل الزيارة</h3><p>أوقات الدوام والأسعار تتغير. اتصل بالجيم قبل ما تروح خصوصًا إذا كانت البيانات من الخرائط المفتوحة.</p></article><article><b>04</b><h3>جاهز للتوسّع</h3><p>البنية مصممة حتى نضيف اشتراكات، QR check-in، ازدحام، أسعار، وحجوزات لاحقًا.</p></article></div><div class="data-note"><strong>آخر مراجعة يدوية: 14 آب 2026</strong><span>مصادر الخريطة: OpenStreetMap ومواقع/دلائل عامة وواجهات رسمية للجيمات عند توفرها.</span></div></section></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="app.js"></script>
+</body>
+</html>
